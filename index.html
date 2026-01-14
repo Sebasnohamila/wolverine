@@ -3,91 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Experiencia Wolverine</title>
+    <title>Experiencia Wolverine V2</title>
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
 
     <style>
         body { margin: 0; padding: 0; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         
-        /* Visor 3D */
         model-viewer {
-            width: 100vw;
-            height: 100vh;
+            width: 100vw; height: 100vh;
             background-color: #f0f0f0;
-            position: absolute;
-            top: 0; left: 0;
-            z-index: 1; 
-            outline: none;
+            position: absolute; top: 0; left: 0; z-index: 1; outline: none;
         }
 
-        /* Pantalla de carga */
         #splash-screen {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center; 
-            justify-content: center;
-            z-index: 999;
-            transition: opacity 0.6s ease-out;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            z-index: 999; transition: opacity 0.6s ease-out;
         }
 
-        #company-logo {
-            max-width: 150px;
-            margin-bottom: 40px;
-        }
+        #company-logo { max-width: 150px; margin-bottom: 40px; }
 
-        #loader-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center; 
-            justify-content: center;
-        }
+        #loader-container { display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
         .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border-left-color: #333;
-            animation: spin 1s linear infinite;
-            margin-bottom: 15px;
+            border: 4px solid rgba(0, 0, 0, 0.1); width: 36px; height: 36px;
+            border-radius: 50%; border-left-color: #333;
+            animation: spin 1s linear infinite; margin-bottom: 15px;
         }
-
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        .loading-text {
-            color: #666;
-            font-size: 13px;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
+        .loading-text { color: #666; font-size: 13px; letter-spacing: 0.5px; text-transform: uppercase; }
         
-        #error-message {
-            color: #e74c3c;
-            margin-top: 20px;
-            display: none;
-            text-align: center;
-            font-size: 14px;
-            padding: 0 20px;
-        }
+        #error-message { color: #e74c3c; margin-top: 20px; display: none; text-align: center; font-size: 14px; }
 
         #start-button {
-            display: none;
-            margin-top: 20px;
-            padding: 15px 35px;
-            background-color: #000;
-            color: white;
-            border: none;
-            border-radius: 30px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            transition: transform 0.2s ease;
+            display: none; margin-top: 20px; padding: 15px 35px;
+            background-color: #000; color: white;
+            border: none; border-radius: 30px;
+            font-size: 14px; font-weight: bold; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15); transition: transform 0.2s ease;
         }
-
         #start-button:active { transform: scale(0.96); }
     </style>
 </head>
@@ -99,8 +56,9 @@
             <div class="spinner"></div>
             <div class="loading-text">Cargando experiencia...</div>
         </div>
-        <div id="error-message">No se encontró el archivo wolverineliviano2.glb</div>
-        <button id="start-button">VER EXPERIENCIA</button>
+        <div id="error-message">No se encontró wolverineliviano2.glb</div>
+        
+        <button id="start-button">VER EXPERIENCIA V2</button>
     </div>
 
     <audio id="bg-music" loop>
@@ -112,9 +70,12 @@
         src="wolverineliviano2.glb"
         alt="Wolverine 3D"
         
-        camera-orbit="-0.01475rad 1.49484rad 750m"
+        camera-orbit="-0.01475rad 1.49484rad 600m"
         camera-target="-0.40003m 101.9667m 89.2276m"
         field-of-view="18.98deg"
+        
+        min-camera-orbit="auto auto auto"
+        max-camera-orbit="auto auto auto"
         
         camera-controls
         shadow-intensity="1"
