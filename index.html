@@ -7,7 +7,6 @@
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
 
     <style>
-        /* FONDO NEGRO */
         body { margin: 0; padding: 0; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #000; }
         
         model-viewer {
@@ -17,7 +16,6 @@
             --poster-color: transparent;
         }
 
-        /* PANTALLA DE CARGA (BLANCA) */
         #splash-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: white;
@@ -73,11 +71,13 @@
         src="wolverineliviano2.glb"
         alt="Wolverine 3D"
         
-        disable-pan
         disable-tap
         
-        min-camera-orbit="-30deg 56deg 100m"
-        max-camera-orbit="30deg 116deg 900m"
+        min-field-of-view="2deg"
+        max-field-of-view="14deg"
+
+        min-camera-orbit="-30deg 56deg auto"
+        max-camera-orbit="30deg 116deg auto"
         
         interpolation-decay="0" 
         camera-controls
@@ -94,18 +94,45 @@
         const audio = document.getElementById('bg-music');
         const errorMsg = document.getElementById('error-message');
 
-        modelViewer.addEventListener('load', () => {
-            console.log("Modelo cargado. Zoom ajustado V9.");
+        // VARIABLES DE CONFIGURACIÓN DE PANEO (VERTICAL)
+        // Posición Y inicial: 101.96m
+        const minY = 95;  // Qué tan abajo puede bajar la cámara
+        const maxY = 108; // Qué tan arriba puede subir la cámara
+        const fixedX = -0.40003; // Bloqueo horizontal exacto
+        const fixedZ = 89.2276;  // Bloqueo profundidad exacto
 
-            // Posición Inicial (600m)
+        modelViewer.addEventListener('load', () => {
+            console.log("V9: Zoom ampliado y Paneo Vertical Limitado.");
+
+            // Posición Inicial
             modelViewer.cameraOrbit = "-0.01475rad 1.49484rad 600m";
-            modelViewer.cameraTarget = "-0.40003m 101.9667m 89.2276m";
+            modelViewer.cameraTarget = `${fixedX}m 101.9667m ${fixedZ}m`;
             modelViewer.fieldOfView = "10deg"; 
             
             modelViewer.jumpCameraToGoal();
 
             loaderContainer.style.display = 'none';
             startButton.style.display = 'block';
+        });
+
+        // --- LÓGICA DE BLOQUEO DE PANEO HORIZONTAL ---
+        modelViewer.addEventListener('camera-change', (e) => {
+            const target = modelViewer.getCameraTarget();
+            
+            // Si el usuario intenta mover a los lados (Eje X) o Profundidad (Eje Z), lo corregimos
+            // Si intenta ir muy arriba o muy abajo (Eje Y), lo limitamos
+            let newX = fixedX;
+            let newZ = fixedZ;
+            let newY = target.y;
+
+            // Restricción Vertical (Clamp)
+            if (newY < minY) newY = minY;
+            if (newY > maxY) newY = maxY;
+
+            // Solo aplicamos la corrección si se ha desviado para ahorrar recursos
+            if (Math.abs(target.x - fixedX) > 0.01 || Math.abs(target.z - fixedZ) > 0.01 || target.y < minY || target.y > maxY) {
+                modelViewer.cameraTarget = `${newX}m ${newY}m ${newZ}m`;
+            }
         });
 
         modelViewer.addEventListener('error', (e) => {
