@@ -3,41 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Experiencia 3D Bhastian</title>
+    <title>Experiencia 3D</title>
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
 
     <style>
-        /* Estilos Generales */
-        body { margin: 0; padding: 0; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { margin: 0; padding: 0; overflow: hidden; font-family: sans-serif; }
         
-        /* Contenedor del modelo 3D */
+        /* El modelo ocupa toda la pantalla pero está detrás (z-index: 1) */
         model-viewer {
             width: 100vw;
             height: 100vh;
-            background-color: #f0f0f0; /* Un gris muy suave para que resalte el modelo */
-            display: none; /* Oculto hasta que cargue */
+            background-color: #f0f0f0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1; 
         }
 
-        /* Pantalla de Carga (Splash Screen) */
+        /* La pantalla de carga tapa todo (z-index: 999) */
         #splash-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background-color: white;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            align-items: center;  /* Centra horizontalmente el contenido principal */
+            justify-content: center; /* Centra verticalmente */
             z-index: 999;
             transition: opacity 0.5s ease;
         }
 
-        /* Logo de la empresa */
         #company-logo {
             max-width: 150px;
             margin-bottom: 40px;
         }
 
-        /* Rueda de carga estilo Apple */
+        /* CORRECCIÓN: Contenedor específico para centrar spinner y texto */
+        #loader-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center; 
+            justify-content: center;
+        }
+
         .spinner {
             border: 4px solid rgba(0, 0, 0, 0.1);
             width: 36px;
@@ -50,15 +58,13 @@
 
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        .loading-text {
-            color: #666;
-            font-size: 14px;
-            letter-spacing: 0.5px;
-        }
+        .loading-text { color: #666; font-size: 14px; }
+        
+        /* Mensaje de error (oculto por defecto) */
+        #error-message { color: red; margin-top: 20px; display: none; text-align: center; }
 
-        /* Botón de Ver Experiencia */
         #start-button {
-            display: none; /* Oculto al inicio */
+            display: none;
             padding: 15px 30px;
             background-color: #000;
             color: white;
@@ -67,71 +73,67 @@
             font-size: 16px;
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            transition: transform 0.2s;
         }
-
-        #start-button:active { transform: scale(0.95); }
-
     </style>
 </head>
 <body>
 
     <div id="splash-screen">
-        <img src="logo.png" alt="Logo Empresa" id="company-logo">
+        <img src="logo.png" alt="Logo" id="company-logo">
         
         <div id="loader-container">
             <div class="spinner"></div>
             <div class="loading-text">Cargando experiencia...</div>
         </div>
 
+        <div id="error-message">
+            No se encontró el archivo "modelo.glb".<br>Revisa el nombre del archivo en GitHub.
+        </div>
+
         <button id="start-button">VER EXPERIENCIA</button>
     </div>
 
     <audio id="bg-music" loop>
-        <source src="xmen1.mp3" type="audio/mpeg">
+        <source src="audio.mp3" type="audio/mpeg">
     </audio>
 
     <model-viewer 
         id="viewer"
-        src="wolverineliviano2.glb"
+        src="modelo.glb"
         alt="Modelo 3D"
         auto-rotate
         camera-controls
         shadow-intensity="1"
-        ar
-        ar-modes="webxr scene-viewer quick-look">
+        ar>
     </model-viewer>
 
     <script>
         const modelViewer = document.querySelector('#viewer');
-        const splashScreen = document.getElementById('splash-screen');
         const loaderContainer = document.getElementById('loader-container');
         const startButton = document.getElementById('start-button');
+        const splashScreen = document.getElementById('splash-screen');
         const audio = document.getElementById('bg-music');
+        const errorMsg = document.getElementById('error-message');
 
-        // 1. Detectar cuando el modelo ha cargado completamente
+        // 1. ÉXITO: El modelo cargó
         modelViewer.addEventListener('load', () => {
-            // Ocultamos el spinner y texto de carga
-            loaderContainer.style.display = 'none';
-            // Mostramos el botón
-            startButton.style.display = 'block';
+            loaderContainer.style.display = 'none'; // Ocultar spinner
+            startButton.style.display = 'block';    // Mostrar botón
+            console.log("Modelo cargado correctamente");
         });
 
-        // 2. Acción al presionar el botón
-        startButton.addEventListener('click', () => {
-            // Reproducir audio (los navegadores requieren clic para esto)
-            audio.play().catch(e => console.log("Error de audio:", e));
-            
-            // Desvanecer pantalla blanca
-            splashScreen.style.opacity = '0';
-            
-            // Mostrar el modelo
-            modelViewer.style.display = 'block';
+        // 2. ERROR: Si el modelo falla (nombre incorrecto o ruta)
+        modelViewer.addEventListener('error', (error) => {
+            loaderContainer.style.display = 'none';
+            errorMsg.style.display = 'block';
+            console.error("Error cargando modelo:", error);
+        });
 
-            // Eliminar la pantalla de carga del DOM después de la transición
-            setTimeout(() => {
-                splashScreen.style.display = 'none';
-            }, 500);
+        // 3. CLIC: Iniciar experiencia
+        startButton.addEventListener('click', () => {
+            audio.play().catch(e => console.log("Audio error:", e));
+            splashScreen.style.opacity = '0';
+            setTimeout(() => { splashScreen.style.display = 'none'; }, 500);
         });
     </script>
 </body>
