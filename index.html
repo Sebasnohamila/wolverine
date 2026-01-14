@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Experiencia Wolverine V4</title>
+    <title>Experiencia Wolverine V5</title>
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
 
     <style>
@@ -58,7 +58,7 @@
         </div>
         <div id="error-message">No se encontró wolverineliviano2.glb</div>
         
-        <button id="start-button">VER EXPERIENCIA V4</button>
+        <button id="start-button">VER EXPERIENCIA V5</button>
     </div>
 
     <audio id="bg-music" loop>
@@ -69,7 +69,12 @@
         id="viewer"
         src="wolverineliviano2.glb"
         alt="Wolverine 3D"
+        
         interpolation-decay="0" 
+        
+        min-camera-orbit="-0.01475rad 1.49484rad auto"
+        max-camera-orbit="-0.01475rad 1.49484rad auto"
+        
         camera-controls
         shadow-intensity="1"
         ar
@@ -84,25 +89,19 @@
         const audio = document.getElementById('bg-music');
         const errorMsg = document.getElementById('error-message');
 
-        // --- AQUÍ ESTÁ LA MAGIA ---
         modelViewer.addEventListener('load', () => {
-            console.log("Modelo cargado. Forzando posición de cámara...");
+            console.log("Modelo cargado. Aplicando restricciones V5...");
 
-            // 1. Definimos los valores que tú querías
-            // NOTA: He puesto field-of-view en 10deg (antes era 18deg). 
-            // Esto hará un ZOOM potente.
+            // Mantenemos tu configuración ideal de inicio
             modelViewer.cameraOrbit = "-0.01475rad 1.49484rad 600m";
             modelViewer.cameraTarget = "-0.40003m 101.9667m 89.2276m";
             modelViewer.fieldOfView = "10deg"; 
             
-            // 2. Obligamos a la cámara a saltar a esa posición YA
             modelViewer.jumpCameraToGoal();
 
-            // 3. Mostramos el botón
             loaderContainer.style.display = 'none';
             startButton.style.display = 'block';
         });
-        // ---------------------------
 
         modelViewer.addEventListener('error', (e) => {
             loaderContainer.style.display = 'none';
