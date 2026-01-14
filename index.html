@@ -7,21 +7,20 @@
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
 
     <style>
-        /* Estilos base */
         body { margin: 0; padding: 0; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         
-        /* El modelo 3D (Fondo y posición) */
+        /* Visor 3D */
         model-viewer {
             width: 100vw;
             height: 100vh;
-            background-color: #f0f0f0; /* Color de fondo gris suave */
+            background-color: #f0f0f0;
             position: absolute;
             top: 0; left: 0;
             z-index: 1; 
             outline: none;
         }
 
-        /* Pantalla de carga (Splash Screen) */
+        /* Pantalla de carga */
         #splash-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -34,13 +33,11 @@
             transition: opacity 0.6s ease-out;
         }
 
-        /* Logo de la empresa */
         #company-logo {
-            max-width: 150px; /* Ajusta este tamaño si tu logo es muy grande */
+            max-width: 150px;
             margin-bottom: 40px;
         }
 
-        /* Contenedor del spinner */
         #loader-container {
             display: flex;
             flex-direction: column;
@@ -48,7 +45,6 @@
             justify-content: center;
         }
 
-        /* Spinner estilo Apple */
         .spinner {
             border: 4px solid rgba(0, 0, 0, 0.1);
             width: 36px;
@@ -68,7 +64,6 @@
             text-transform: uppercase;
         }
         
-        /* Mensaje de error */
         #error-message {
             color: #e74c3c;
             margin-top: 20px;
@@ -78,9 +73,8 @@
             padding: 0 20px;
         }
 
-        /* Botón Ver Experiencia */
         #start-button {
-            display: none; /* Oculto hasta que cargue */
+            display: none;
             margin-top: 20px;
             padding: 15px 35px;
             background-color: #000;
@@ -91,30 +85,21 @@
             font-weight: bold;
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transition: transform 0.2s ease;
         }
 
-        #start-button:active {
-            transform: scale(0.96);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
+        #start-button:active { transform: scale(0.96); }
     </style>
 </head>
 <body>
 
     <div id="splash-screen">
         <img src="logo.png" alt="Logo Bhastian" id="company-logo">
-        
         <div id="loader-container">
             <div class="spinner"></div>
             <div class="loading-text">Cargando experiencia...</div>
         </div>
-
-        <div id="error-message">
-            No se encontró el archivo <strong>wolverineliviano2.glb</strong>.<br>
-            Verifica el nombre en GitHub.
-        </div>
-
+        <div id="error-message">No se encontró el archivo wolverineliviano2.glb</div>
         <button id="start-button">VER EXPERIENCIA</button>
     </div>
 
@@ -125,16 +110,14 @@
     <model-viewer 
         id="viewer"
         src="wolverineliviano2.glb"
-        alt="Wolverine 3D Bhastian"
+        alt="Wolverine 3D"
         
-        /* TUS DATOS DEFINITIVOS */
-        camera-orbit="-0.01475rad 1.49484rad 1187.32m"
+        camera-orbit="-0.01475rad 1.49484rad 750m"
         camera-target="-0.40003m 101.9667m 89.2276m"
         field-of-view="18.98deg"
         
         camera-controls
         shadow-intensity="1"
-        disable-zoom="false"
         ar
         ar-modes="webxr scene-viewer quick-look">
     </model-viewer>
@@ -147,34 +130,20 @@
         const audio = document.getElementById('bg-music');
         const errorMsg = document.getElementById('error-message');
 
-        // 1. CARGA COMPLETADA
         modelViewer.addEventListener('load', () => {
-            console.log("Modelo cargado exitosamente.");
-            // Ocultamos el spinner
             loaderContainer.style.display = 'none';
-            // Mostramos el botón de inicio
             startButton.style.display = 'block';
         });
 
-        // 2. ERROR EN CARGA
-        modelViewer.addEventListener('error', (error) => {
-            console.error("Error cargando el modelo:", error);
+        modelViewer.addEventListener('error', (e) => {
             loaderContainer.style.display = 'none';
             errorMsg.style.display = 'block';
         });
 
-        // 3. INICIAR EXPERIENCIA
         startButton.addEventListener('click', () => {
-            // Reproducir audio
-            audio.play().catch(e => console.log("Advertencia de audio:", e));
-            
-            // Efecto de desvanecimiento
+            audio.play().catch(e => console.log(e));
             splashScreen.style.opacity = '0';
-            
-            // Quitar pantalla de carga del flujo
-            setTimeout(() => {
-                splashScreen.style.display = 'none';
-            }, 600); // Espera 0.6s que dura la transición
+            setTimeout(() => { splashScreen.style.display = 'none'; }, 600);
         });
     </script>
 </body>
