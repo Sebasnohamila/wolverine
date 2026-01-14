@@ -3,89 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Experiencia Wolverine</title>
+    <title>Wolverine DEBUG FINAL</title>
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
 
     <style>
         body { margin: 0; padding: 0; overflow: hidden; font-family: sans-serif; }
         
-        /* El modelo ocupa toda la pantalla pero está detrás */
+        /* El modelo 3D */
         model-viewer {
-            width: 100vw;
-            height: 100vh;
+            width: 100vw; height: 100vh;
             background-color: #f0f0f0;
-            position: absolute;
-            top: 0; left: 0; z-index: 1; 
+            position: absolute; top: 0; left: 0; z-index: 1; 
+        }
+
+        /* PANEL DE DATOS (SOLO PARA QUE COPIES LOS NÚMEROS) */
+        #debug-panel {
+            position: fixed;
+            bottom: 10px; left: 10px; right: 10px;
+            background-color: rgba(0, 0, 0, 0.85);
+            color: #00ff00;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 12px;
+            z-index: 99999; /* Por encima de todo */
+            pointer-events: none; /* Para poder tocar el modelo a través del texto */
+            border: 2px solid lime;
+            display: none; /* Se oculta al inicio, sale cuando entras a la experiencia */
+            white-space: pre-wrap;
         }
 
         /* Pantalla de carga */
         #splash-screen {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center; 
-            justify-content: center;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
             z-index: 999;
             transition: opacity 0.5s ease;
         }
 
-        #company-logo {
-            max-width: 150px;
-            margin-bottom: 40px;
-        }
+        #company-logo { max-width: 150px; margin-bottom: 40px; }
 
-        #loader-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center; 
-            justify-content: center;
-        }
+        #loader-container { display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
         .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border-left-color: #333;
-            animation: spin 1s linear infinite;
-            margin-bottom: 15px;
+            border: 4px solid rgba(0, 0, 0, 0.1); width: 36px; height: 36px;
+            border-radius: 50%; border-left-color: #333;
+            animation: spin 1s linear infinite; margin-bottom: 15px;
         }
-
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         .loading-text { color: #666; font-size: 14px; }
-        
         #error-message { color: red; margin-top: 20px; display: none; text-align: center; }
 
         #start-button {
-            display: none;
-            padding: 15px 30px;
-            background-color: #000;
-            color: white;
-            border: none;
-            border-radius: 25px;
-            font-size: 16px;
-            cursor: pointer;
+            display: none; padding: 15px 30px;
+            background-color: #000; color: white;
+            border: none; border-radius: 25px;
+            font-size: 16px; cursor: pointer;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
     </style>
 </head>
 <body>
 
+    <div id="debug-panel">Mueve el modelo para ver datos...</div>
+
     <div id="splash-screen">
-        <img src="logo.png" alt="Logo Bhastian" id="company-logo">
-        
+        <img src="logo.png" alt="Logo" id="company-logo">
         <div id="loader-container">
             <div class="spinner"></div>
             <div class="loading-text">Cargando experiencia...</div>
         </div>
-
-        <div id="error-message">
-            No se encontró el archivo "wolverineliviano2.glb".<br>Revisa el nombre en GitHub.
-        </div>
-
+        <div id="error-message">No se encontró "wolverineliviano2.glb"</div>
         <button id="start-button">VER EXPERIENCIA</button>
     </div>
 
@@ -96,12 +86,7 @@
     <model-viewer 
         id="viewer"
         src="wolverineliviano2.glb"
-        alt="Wolverine 3D"
-        
-        camera-orbit="0.02075rad 1.5302rad 1196.71m"
-        camera-target="-0.8536m 110.6792m 86.8968m"
-        field-of-view="18.286deg"
-        
+        alt="Wolverine"
         camera-controls
         shadow-intensity="1"
         ar>
@@ -114,26 +99,47 @@
         const splashScreen = document.getElementById('splash-screen');
         const audio = document.getElementById('bg-music');
         const errorMsg = document.getElementById('error-message');
+        const debugPanel = document.getElementById('debug-panel');
 
-        // Cuando carga el modelo
+        // Carga completada
         modelViewer.addEventListener('load', () => {
             loaderContainer.style.display = 'none';
             startButton.style.display = 'block';
-            console.log("Wolverine cargado y posicionado.");
         });
 
-        // Si hay error
-        modelViewer.addEventListener('error', (error) => {
+        // Error
+        modelViewer.addEventListener('error', (e) => {
             loaderContainer.style.display = 'none';
             errorMsg.style.display = 'block';
-            console.error("Error cargando GLB:", error);
         });
 
-        // Al hacer click en Ver Experiencia
+        // Click en iniciar
         startButton.addEventListener('click', () => {
-            audio.play().catch(e => console.log("Audio error:", e));
+            audio.play().catch(e => console.log(e));
             splashScreen.style.opacity = '0';
             setTimeout(() => { splashScreen.style.display = 'none'; }, 500);
+            
+            // MOSTRAR EL PANEL DE DATOS AHORA
+            debugPanel.style.display = 'block';
+        });
+
+        // LÓGICA DE RASTREO DE POSICIÓN
+        modelViewer.addEventListener('camera-change', (event) => {
+            const orbit = modelViewer.getCameraOrbit();
+            const target = modelViewer.getCameraTarget();
+            const fov = modelViewer.getFieldOfView();
+
+            // Formatear datos para copiar fácil
+            const orbitTxt = `${orbit.theta}rad ${orbit.phi}rad ${orbit.radius}m`;
+            const targetTxt = `${target.x}m ${target.y}m ${target.z}m`;
+            const fovTxt = `${fov}deg`;
+
+            debugPanel.innerHTML = `
+=== DATOS ACTUALES (Copia esto) ===
+camera-orbit="${orbitTxt}"
+camera-target="${targetTxt}"
+field-of-view="${fovTxt}"
+            `;
         });
     </script>
 </body>
