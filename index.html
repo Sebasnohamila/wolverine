@@ -98,12 +98,10 @@
         src="wolverineliviano2.glb"
         alt="Wolverine 3D"
         
-        /* TUS DATOS DE POSICIÓN */
-        camera-orbit="0.020751975497242097rad 1.5302374852732117rad 1196.7118074983553m"
-        camera-target="-0.853619793680227m 110.67920226676614m 86.8967854704676m"
-        field-of-view="18.286182673304666deg"
+        camera-orbit="0.02075rad 1.5302rad 1196.71m"
+        camera-target="-0.8536m 110.6792m 86.8968m"
+        field-of-view="18.286deg"
         
-        auto-rotate
         camera-controls
         shadow-intensity="1"
         ar>
@@ -117,18 +115,21 @@
         const audio = document.getElementById('bg-music');
         const errorMsg = document.getElementById('error-message');
 
+        // Cuando carga el modelo
         modelViewer.addEventListener('load', () => {
             loaderContainer.style.display = 'none';
             startButton.style.display = 'block';
             console.log("Wolverine cargado y posicionado.");
         });
 
+        // Si hay error
         modelViewer.addEventListener('error', (error) => {
             loaderContainer.style.display = 'none';
             errorMsg.style.display = 'block';
             console.error("Error cargando GLB:", error);
         });
 
+        // Al hacer click en Ver Experiencia
         startButton.addEventListener('click', () => {
             audio.play().catch(e => console.log("Audio error:", e));
             splashScreen.style.opacity = '0';
