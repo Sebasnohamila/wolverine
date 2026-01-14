@@ -3,79 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wolverine DEBUG FINAL</title>
+    <title>Experiencia Wolverine</title>
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
 
     <style>
-        body { margin: 0; padding: 0; overflow: hidden; font-family: sans-serif; }
+        /* Estilos base */
+        body { margin: 0; padding: 0; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         
-        /* El modelo 3D */
+        /* El modelo 3D (Fondo y posición) */
         model-viewer {
-            width: 100vw; height: 100vh;
-            background-color: #f0f0f0;
-            position: absolute; top: 0; left: 0; z-index: 1; 
+            width: 100vw;
+            height: 100vh;
+            background-color: #f0f0f0; /* Color de fondo gris suave */
+            position: absolute;
+            top: 0; left: 0;
+            z-index: 1; 
+            outline: none;
         }
 
-        /* PANEL DE DATOS (SOLO PARA QUE COPIES LOS NÚMEROS) */
-        #debug-panel {
-            position: fixed;
-            bottom: 10px; left: 10px; right: 10px;
-            background-color: rgba(0, 0, 0, 0.85);
-            color: #00ff00;
-            padding: 15px;
-            font-family: monospace;
-            font-size: 12px;
-            z-index: 99999; /* Por encima de todo */
-            pointer-events: none; /* Para poder tocar el modelo a través del texto */
-            border: 2px solid lime;
-            display: none; /* Se oculta al inicio, sale cuando entras a la experiencia */
-            white-space: pre-wrap;
-        }
-
-        /* Pantalla de carga */
+        /* Pantalla de carga (Splash Screen) */
         #splash-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
             background-color: white;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center; 
+            justify-content: center;
             z-index: 999;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.6s ease-out;
         }
 
-        #company-logo { max-width: 150px; margin-bottom: 40px; }
+        /* Logo de la empresa */
+        #company-logo {
+            max-width: 150px; /* Ajusta este tamaño si tu logo es muy grande */
+            margin-bottom: 40px;
+        }
 
-        #loader-container { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        /* Contenedor del spinner */
+        #loader-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center; 
+            justify-content: center;
+        }
 
+        /* Spinner estilo Apple */
         .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1); width: 36px; height: 36px;
-            border-radius: 50%; border-left-color: #333;
-            animation: spin 1s linear infinite; margin-bottom: 15px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #333;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
         }
+
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        .loading-text { color: #666; font-size: 14px; }
-        #error-message { color: red; margin-top: 20px; display: none; text-align: center; }
+        .loading-text {
+            color: #666;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        
+        /* Mensaje de error */
+        #error-message {
+            color: #e74c3c;
+            margin-top: 20px;
+            display: none;
+            text-align: center;
+            font-size: 14px;
+            padding: 0 20px;
+        }
 
+        /* Botón Ver Experiencia */
         #start-button {
-            display: none; padding: 15px 30px;
-            background-color: #000; color: white;
-            border: none; border-radius: 25px;
-            font-size: 16px; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: none; /* Oculto hasta que cargue */
+            margin-top: 20px;
+            padding: 15px 35px;
+            background-color: #000;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        #start-button:active {
+            transform: scale(0.96);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
     </style>
 </head>
 <body>
 
-    <div id="debug-panel">Mueve el modelo para ver datos...</div>
-
     <div id="splash-screen">
-        <img src="logo.png" alt="Logo" id="company-logo">
+        <img src="logo.png" alt="Logo Bhastian" id="company-logo">
+        
         <div id="loader-container">
             <div class="spinner"></div>
             <div class="loading-text">Cargando experiencia...</div>
         </div>
-        <div id="error-message">No se encontró "wolverineliviano2.glb"</div>
+
+        <div id="error-message">
+            No se encontró el archivo <strong>wolverineliviano2.glb</strong>.<br>
+            Verifica el nombre en GitHub.
+        </div>
+
         <button id="start-button">VER EXPERIENCIA</button>
     </div>
 
@@ -86,10 +125,18 @@
     <model-viewer 
         id="viewer"
         src="wolverineliviano2.glb"
-        alt="Wolverine"
+        alt="Wolverine 3D Bhastian"
+        
+        /* TUS DATOS DEFINITIVOS */
+        camera-orbit="-0.01475rad 1.49484rad 1187.32m"
+        camera-target="-0.40003m 101.9667m 89.2276m"
+        field-of-view="18.98deg"
+        
         camera-controls
         shadow-intensity="1"
-        ar>
+        disable-zoom="false"
+        ar
+        ar-modes="webxr scene-viewer quick-look">
     </model-viewer>
 
     <script>
@@ -99,47 +146,35 @@
         const splashScreen = document.getElementById('splash-screen');
         const audio = document.getElementById('bg-music');
         const errorMsg = document.getElementById('error-message');
-        const debugPanel = document.getElementById('debug-panel');
 
-        // Carga completada
+        // 1. CARGA COMPLETADA
         modelViewer.addEventListener('load', () => {
+            console.log("Modelo cargado exitosamente.");
+            // Ocultamos el spinner
             loaderContainer.style.display = 'none';
+            // Mostramos el botón de inicio
             startButton.style.display = 'block';
         });
 
-        // Error
-        modelViewer.addEventListener('error', (e) => {
+        // 2. ERROR EN CARGA
+        modelViewer.addEventListener('error', (error) => {
+            console.error("Error cargando el modelo:", error);
             loaderContainer.style.display = 'none';
             errorMsg.style.display = 'block';
         });
 
-        // Click en iniciar
+        // 3. INICIAR EXPERIENCIA
         startButton.addEventListener('click', () => {
-            audio.play().catch(e => console.log(e));
-            splashScreen.style.opacity = '0';
-            setTimeout(() => { splashScreen.style.display = 'none'; }, 500);
+            // Reproducir audio
+            audio.play().catch(e => console.log("Advertencia de audio:", e));
             
-            // MOSTRAR EL PANEL DE DATOS AHORA
-            debugPanel.style.display = 'block';
-        });
-
-        // LÓGICA DE RASTREO DE POSICIÓN
-        modelViewer.addEventListener('camera-change', (event) => {
-            const orbit = modelViewer.getCameraOrbit();
-            const target = modelViewer.getCameraTarget();
-            const fov = modelViewer.getFieldOfView();
-
-            // Formatear datos para copiar fácil
-            const orbitTxt = `${orbit.theta}rad ${orbit.phi}rad ${orbit.radius}m`;
-            const targetTxt = `${target.x}m ${target.y}m ${target.z}m`;
-            const fovTxt = `${fov}deg`;
-
-            debugPanel.innerHTML = `
-=== DATOS ACTUALES (Copia esto) ===
-camera-orbit="${orbitTxt}"
-camera-target="${targetTxt}"
-field-of-view="${fovTxt}"
-            `;
+            // Efecto de desvanecimiento
+            splashScreen.style.opacity = '0';
+            
+            // Quitar pantalla de carga del flujo
+            setTimeout(() => {
+                splashScreen.style.display = 'none';
+            }, 600); // Espera 0.6s que dura la transición
         });
     </script>
 </body>
