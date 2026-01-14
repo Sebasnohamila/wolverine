@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Experiencia 3D</title>
+    <title>Experiencia Wolverine</title>
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
 
     <style>
@@ -27,8 +27,8 @@
             background-color: white;
             display: flex;
             flex-direction: column;
-            align-items: center;  /* Centra horizontalmente el contenido principal */
-            justify-content: center; /* Centra verticalmente */
+            align-items: center; 
+            justify-content: center;
             z-index: 999;
             transition: opacity 0.5s ease;
         }
@@ -38,7 +38,7 @@
             margin-bottom: 40px;
         }
 
-        /* CORRECCIÓN: Contenedor específico para centrar spinner y texto */
+        /* Contenedor específico para centrar spinner y texto */
         #loader-container {
             display: flex;
             flex-direction: column;
@@ -60,7 +60,7 @@
 
         .loading-text { color: #666; font-size: 14px; }
         
-        /* Mensaje de error (oculto por defecto) */
+        /* Mensaje de error personalizado */
         #error-message { color: red; margin-top: 20px; display: none; text-align: center; }
 
         #start-button {
@@ -79,7 +79,7 @@
 <body>
 
     <div id="splash-screen">
-        <img src="logo.png" alt="Logo" id="company-logo">
+        <img src="logo.png" alt="Logo Bhastian" id="company-logo">
         
         <div id="loader-container">
             <div class="spinner"></div>
@@ -87,7 +87,7 @@
         </div>
 
         <div id="error-message">
-            No se encontró el archivo "modelo.glb".<br>Revisa el nombre del archivo en GitHub.
+            No se encontró el archivo "wolverineliviano2.glb".<br>Revisa el nombre en GitHub.
         </div>
 
         <button id="start-button">VER EXPERIENCIA</button>
@@ -100,7 +100,7 @@
     <model-viewer 
         id="viewer"
         src="wolverineliviano2.glb"
-        alt="Modelo 3D"
+        alt="Wolverine 3D"
         auto-rotate
         camera-controls
         shadow-intensity="1"
@@ -119,18 +119,19 @@
         modelViewer.addEventListener('load', () => {
             loaderContainer.style.display = 'none'; // Ocultar spinner
             startButton.style.display = 'block';    // Mostrar botón
-            console.log("Modelo cargado correctamente");
+            console.log("Wolverine cargado correctamente");
         });
 
-        // 2. ERROR: Si el modelo falla (nombre incorrecto o ruta)
+        // 2. ERROR: Si falla la carga
         modelViewer.addEventListener('error', (error) => {
             loaderContainer.style.display = 'none';
             errorMsg.style.display = 'block';
-            console.error("Error cargando modelo:", error);
+            console.error("Error cargando wolverineliviano2.glb:", error);
         });
 
         // 3. CLIC: Iniciar experiencia
         startButton.addEventListener('click', () => {
+            // Reproducir xmen1.mp3
             audio.play().catch(e => console.log("Audio error:", e));
             splashScreen.style.opacity = '0';
             setTimeout(() => { splashScreen.style.display = 'none'; }, 500);
