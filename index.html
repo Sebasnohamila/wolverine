@@ -3,20 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Experiencia Wolverine V9</title>
+    <title>Experiencia Wolverine V10 Final</title>
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
 
     <style>
-        /* Fondo Negro */
+        /* Fondo Negro General */
         body { margin: 0; padding: 0; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #000; }
         
-        /* Visor */
+        /* Visor 3D */
         model-viewer {
             width: 100vw; height: 100vh;
             background-color: #000000;
             position: absolute; top: 0; left: 0; z-index: 1; outline: none;
             --poster-color: transparent;
         }
+
+        /* --- ESTILOS DEL BOTÓN DE WHATSAPP --- */
+        #whatsapp-button {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            z-index: 9999; /* Por encima de todo */
+            width: 60px;
+            height: 60px;
+            background-color: #25D366; /* Color oficial de WhatsApp */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            transition: transform 0.3s ease;
+            /* Oculto al inicio mientras carga la experiencia */
+            opacity: 0; 
+            pointer-events: none;
+        }
+
+        #whatsapp-button img {
+            width: 35px;
+            height: 35px;
+        }
+
+        #whatsapp-button:hover {
+            transform: scale(1.1); /* Efecto al pasar el mouse */
+        }
+
+        /* Cuando la experiencia carga, mostramos el botón */
+        body.loaded #whatsapp-button {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        /* ------------------------------------ */
 
         /* Pantalla de Carga Blanca */
         #splash-screen {
@@ -57,7 +93,7 @@
             <div class="loading-text">Cargando experiencia...</div>
         </div>
         <div id="error-message">No se encontró wolverineliviano2.glb</div>
-        <button id="start-button">VER EXPERIENCIA V9</button>
+        <button id="start-button">VER EXPERIENCIA V10</button>
     </div>
 
     <audio id="bg-music" loop>
@@ -72,7 +108,7 @@
         disable-tap
         
         min-field-of-view="5deg"
-        max-field-of-view="60deg"
+        max-field-of-view="15deg"
         
         min-camera-orbit="-30deg 56deg auto"
         max-camera-orbit="30deg 116deg auto"
@@ -84,6 +120,10 @@
         ar-modes="webxr scene-viewer quick-look">
     </model-viewer>
 
+    <a href="https://wa.me/593983088889" target="_blank" id="whatsapp-button">
+        <img src="whatsapp.png" alt="Contactar por WhatsApp">
+    </a>
+
     <script>
         const modelViewer = document.querySelector('#viewer');
         const loaderContainer = document.getElementById('loader-container');
@@ -92,23 +132,21 @@
         const audio = document.getElementById('bg-music');
         const errorMsg = document.getElementById('error-message');
         
-        // VARIABLES PARA CONTROLAR EL PANEO
+        // Variables de Paneo Vertical V9
         let isLoaded = false;
-        // Estas son las coordenadas originales que nos gustaron
         const initialX = -0.40003; 
         const initialY = 101.9667; 
-        const initialZ = 89.2276;
-        
-        // Rango de movimiento vertical permitido (aprox 30 unidades arriba/abajo)
+        // Rango vertical permitido
         const limitY = 30; 
 
         modelViewer.addEventListener('load', () => {
-            console.log("Modelo cargado. Aplicando V9...");
+            console.log("Modelo cargado. Aplicando V10...");
             isLoaded = true;
 
             // Posición Inicial
             modelViewer.cameraOrbit = "-0.01475rad 1.49484rad 600m";
-            modelViewer.cameraTarget = `${initialX}m ${initialY}m ${initialZ}m`;
+            // Nos aseguramos que el target inicial sea exactamente el centro matemático
+            modelViewer.cameraTarget = `${initialX}m ${initialY}m 89.2276m`;
             modelViewer.fieldOfView = "10deg"; 
             
             modelViewer.jumpCameraToGoal();
@@ -117,30 +155,19 @@
             startButton.style.display = 'block';
         });
 
-        // --- LÓGICA DE BLOQUEO DE PANEO HORIZONTAL ---
+        // Lógica de Bloqueo Horizontal (Misma de V9)
         modelViewer.addEventListener('camera-change', (event) => {
             if (!isLoaded) return;
-
             const target = modelViewer.getCameraTarget();
-            
-            // 1. ¿Se movió en X (Lados)? -> ¡CORREGIRLO!
-            // Si intenta irse a los lados, lo forzamos a volver a 'initialX'
-            let newX = initialX;
-
-            // 2. ¿Se movió en Y (Arriba/Abajo)? -> ¡LIMITARLO!
+            let newX = initialX; // Siempre forzar X al centro
             let newY = target.y;
-            // Techo (No subir más de esto)
             if (newY > initialY + limitY) newY = initialY + limitY;
-            // Suelo (No bajar más de esto)
             if (newY < initialY - limitY) newY = initialY - limitY;
 
-            // Si las coordenadas corregidas son diferentes a las actuales, aplicamos la corrección
             if (Math.abs(target.x - newX) > 0.001 || Math.abs(target.y - newY) > 0.001) {
-                // Mantenemos la Z actual para no romper la profundidad
                 modelViewer.cameraTarget = `${newX}m ${newY}m ${target.z}m`;
             }
         });
-        // ---------------------------------------------
 
         modelViewer.addEventListener('error', (e) => {
             loaderContainer.style.display = 'none';
@@ -150,7 +177,11 @@
         startButton.addEventListener('click', () => {
             audio.play().catch(e => console.log(e));
             splashScreen.style.opacity = '0';
-            setTimeout(() => { splashScreen.style.display = 'none'; }, 600);
+            setTimeout(() => { 
+                splashScreen.style.display = 'none';
+                // Añadimos la clase 'loaded' al body para mostrar el botón de WhatsApp suavemente
+                document.body.classList.add('loaded');
+            }, 600);
         });
     </script>
 </body>
