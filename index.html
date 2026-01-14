@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Experiencia Wolverine V6</title>
+    <title>Experiencia Wolverine V7</title>
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
 
     <style>
@@ -58,7 +58,7 @@
         </div>
         <div id="error-message">No se encontró wolverineliviano2.glb</div>
         
-        <button id="start-button">VER EXPERIENCIA V6</button>
+        <button id="start-button">VER EXPERIENCIA V7</button>
     </div>
 
     <audio id="bg-music" loop>
@@ -72,6 +72,9 @@
         
         disable-pan
         disable-tap
+        
+        min-camera-orbit="-30deg 56deg auto"
+        max-camera-orbit="30deg 116deg auto"
         
         interpolation-decay="0" 
         camera-controls
@@ -89,14 +92,13 @@
         const errorMsg = document.getElementById('error-message');
 
         modelViewer.addEventListener('load', () => {
-            console.log("Modelo cargado. Aplicando V6 (Sin Paneo)...");
+            console.log("Modelo cargado. Aplicando V7 (Límites 30 grados)...");
 
-            // FORZAMOS LA POSICIÓN INICIAL (El zoom y ángulo que te gustaron)
+            // Configuración inicial exacta
             modelViewer.cameraOrbit = "-0.01475rad 1.49484rad 600m";
             modelViewer.cameraTarget = "-0.40003m 101.9667m 89.2276m";
             modelViewer.fieldOfView = "10deg"; 
             
-            // Aplicar cambios inmediatamente
             modelViewer.jumpCameraToGoal();
 
             loaderContainer.style.display = 'none';
