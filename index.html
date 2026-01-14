@@ -1,219 +1,195 @@
-<!doctype html>
-<html>
-    <head>
-        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Experiencia Wolverine V11</title>
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
 
-        <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
-        <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-        <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+    <style>
+        /* Fondo Negro General */
+        body { margin: 0; padding: 0; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #000; }
+        
+        /* Visor 3D */
+        model-viewer {
+            width: 100vw; height: 100vh;
+            background-color: #000000;
+            position: absolute; top: 0; left: 0; z-index: 1; outline: none;
+            --poster-color: transparent;
+        }
 
-        <style>
-            body { margin: 0; overflow: hidden; touch-action: none; font-family: Arial, sans-serif;}
+        /* --- ESTILOS DEL BOTÓN DE WHATSAPP (CORREGIDO) --- */
+        #whatsapp-button {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            z-index: 9999;
             
-            /* PANTALLA DE CARGA */
-            #splash-screen {
-                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-                background-color: white; z-index: 9999;
-                display: flex; justify-content: center; align-items: center;
-                transition: opacity 1s ease-out;
+            /* TAMAÑO REDUCIDO UN 30% (Antes 60px, ahora 42px) */
+            width: 42px;
+            height: 42px;
+            
+            /* FONDO TRANSPARENTE (Quitamos el verde #25D366) */
+            background-color: transparent;
+            
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            
+            /* Quitamos sombra para que sea más limpio, o dejamos una suave si el logo es oscuro */
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
+            
+            transition: transform 0.3s ease;
+            opacity: 0; 
+            pointer-events: none;
+            
+            /* Quitamos border-radius del contenedor porque ya no es un círculo de color */
+            border: none;
+            text-decoration: none; /* Por si acaso */
+        }
+
+        #whatsapp-button img {
+            /* La imagen ocupa todo el espacio del botón reducido */
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        #whatsapp-button:hover {
+            transform: scale(1.1);
+        }
+
+        body.loaded #whatsapp-button {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        /* ------------------------------------ */
+
+        /* Pantalla de Carga Blanca */
+        #splash-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: white;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            z-index: 999; transition: opacity 0.6s ease-out;
+        }
+
+        #company-logo { max-width: 150px; margin-bottom: 40px; }
+        #loader-container { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1); width: 36px; height: 36px;
+            border-radius: 50%; border-left-color: #333;
+            animation: spin 1s linear infinite; margin-bottom: 15px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .loading-text { color: #666; font-size: 13px; letter-spacing: 0.5px; text-transform: uppercase; }
+        #error-message { color: #e74c3c; margin-top: 20px; display: none; text-align: center; font-size: 14px; }
+        
+        #start-button {
+            display: none; margin-top: 20px; padding: 15px 35px;
+            background-color: #000; color: white;
+            border: none; border-radius: 30px;
+            font-size: 14px; font-weight: bold; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15); transition: transform 0.2s ease;
+        }
+        #start-button:active { transform: scale(0.96); }
+    </style>
+</head>
+<body>
+
+    <div id="splash-screen">
+        <img src="logo.png" alt="Logo Bhastian" id="company-logo">
+        <div id="loader-container">
+            <div class="spinner"></div>
+            <div class="loading-text">Cargando experiencia...</div>
+        </div>
+        <div id="error-message">No se encontró wolverineliviano2.glb</div>
+        <button id="start-button">VER EXPERIENCIA</button>
+    </div>
+
+    <audio id="bg-music" loop>
+        <source src="xmen1.mp3" type="audio/mpeg">
+    </audio>
+
+    <model-viewer 
+        id="viewer"
+        src="wolverineliviano2.glb"
+        alt="Wolverine 3D"
+        disable-tap
+        min-field-of-view="5deg"
+        max-field-of-view="15deg"
+        min-camera-orbit="-30deg 56deg auto"
+        max-camera-orbit="30deg 116deg auto"
+        interpolation-decay="0" 
+        camera-controls
+        shadow-intensity="1"
+        ar
+        ar-modes="webxr scene-viewer quick-look">
+    </model-viewer>
+
+    <a href="https://wa.me/593983088889" id="whatsapp-button">
+        <img src="whatsapp.png" alt="WhatsApp">
+    </a>
+
+    <script>
+        const modelViewer = document.querySelector('#viewer');
+        const loaderContainer = document.getElementById('loader-container');
+        const startButton = document.getElementById('start-button');
+        const splashScreen = document.getElementById('splash-screen');
+        const audio = document.getElementById('bg-music');
+        const errorMsg = document.getElementById('error-message');
+        const whatsappBtn = document.getElementById('whatsapp-button');
+        
+        let isLoaded = false;
+        const initialX = -0.40003; 
+        const initialY = 101.9667; 
+        const limitY = 30; 
+
+        modelViewer.addEventListener('load', () => {
+            console.log("Modelo cargado. V11 Lista.");
+            isLoaded = true;
+
+            modelViewer.cameraOrbit = "-0.01475rad 1.49484rad 600m";
+            modelViewer.cameraTarget = `${initialX}m ${initialY}m 89.2276m`;
+            modelViewer.fieldOfView = "10deg"; 
+            modelViewer.jumpCameraToGoal();
+
+            loaderContainer.style.display = 'none';
+            startButton.style.display = 'block';
+        });
+
+        modelViewer.addEventListener('camera-change', (event) => {
+            if (!isLoaded) return;
+            const target = modelViewer.getCameraTarget();
+            let newX = initialX;
+            let newY = target.y;
+            if (newY > initialY + limitY) newY = initialY + limitY;
+            if (newY < initialY - limitY) newY = initialY - limitY;
+
+            if (Math.abs(target.x - newX) > 0.001 || Math.abs(target.y - newY) > 0.001) {
+                modelViewer.cameraTarget = `${newX}m ${newY}m ${target.z}m`;
             }
-            #splash-screen img { max-width: 60%; height: auto; }
-            .arjs-ready #splash-screen { opacity: 0; pointer-events: none; }
+        });
 
-            /* ESTILOS DEL BOTÓN DE WHATSAPP */
-            #whatsapp-button {
-                display: none; 
-                position: fixed;
-                bottom: 15px; 
-                left: 15px;      
-                z-index: 9998;
-                background-color: transparent;
-                padding: 0;
-                border: none;
-                transform: none;
-                transition: transform 0.1s;
-            }
-            #whatsapp-button img {
-                width: 30px;   
-                height: 30px;
-                filter: drop-shadow(0px 2px 3px rgba(0,0,0,0.5)); 
-            }
-            #whatsapp-button:active {
-                transform: scale(0.9); 
-            }
-        </style>
+        modelViewer.addEventListener('error', (e) => {
+            loaderContainer.style.display = 'none';
+            errorMsg.style.display = 'block';
+        });
 
-        <script>
-            // --- COMPONENTE 1: ARREGLAR MATERIALES NEGROS ---
-            AFRAME.registerComponent('fix-materials', {
-                init: function () {
-                    this.el.addEventListener('model-loaded', function (e) {
-                        var mesh = e.detail.model;
-                        mesh.traverse(function (node) {
-                            if (node.isMesh && node.material) {
-                                node.material.metalness = 0;
-                                node.material.roughness = 1;
-                                node.material.needsUpdate = true;
-                            }
-                        });
-                        console.log("Materiales corregidos (Metalness removido)");
-                    });
-                }
-            });
+        startButton.addEventListener('click', () => {
+            audio.play().catch(e => console.log(e));
+            splashScreen.style.opacity = '0';
+            setTimeout(() => { 
+                splashScreen.style.display = 'none';
+                document.body.classList.add('loaded');
+            }, 600);
+        });
 
-            // --- COMPONENTE 2: CONTROLADOR PRINCIPAL (Gestos y Video) ---
-            AFRAME.registerComponent('master-controller', {
-                init: function () {
-                    this.marker = document.querySelector("#markerA");
-                    this.hud = document.querySelector("#hud-container");
-                    
-                    this.vid = document.querySelector("#vid");
-                    this.model = document.querySelector("#animatedModel");
-                    this.waButton = document.querySelector("#whatsapp-button");
-                    
-                    this.isUnlocked = false; 
-                    
-                    this.startX = 0;
-                    this.startY = 0;
-                    this.initialDistance = 0;
-                    this.initialScaleVector = new THREE.Vector3();
-
-                    this.marker.addEventListener('markerFound', () => {
-                        if (this.isUnlocked) return;
-                        console.log("¡Marcador detectado!");
-                        this.isUnlocked = true;
-                        
-                        this.hud.setAttribute('visible', 'true');
-                        this.waButton.style.display = "block"; 
-                        
-                        if(this.vid){
-                            this.vid.play().catch(e => console.log("Error reproduciendo audio:", e));
-                            this.vid.volume = 1.0; 
-                        }
-
-                        if (this.model) this.model.setAttribute('animation-mixer', 'timeScale: 1');
-                    });
-
-                    window.addEventListener('touchstart', (e) => {
-                        if (!this.isUnlocked) return;
-                        
-                        if(this.vid && this.vid.paused){
-                            this.vid.play();
-                        }
-
-                        if(e.touches.length === 1) {
-                            this.startX = e.touches[0].clientX;
-                            this.startY = e.touches[0].clientY;
-                        } else if (e.touches.length === 2) {
-                            var dx = e.touches[0].clientX - e.touches[1].clientX;
-                            var dy = e.touches[0].clientY - e.touches[1].clientY;
-                            this.initialDistance = Math.sqrt(dx * dx + dy * dy);
-                            this.initialScaleVector.copy(this.model.object3D.scale);
-                        }
-                    });
-
-                    window.addEventListener('touchmove', (e) => {
-                        if (!this.isUnlocked) return;
-                        
-                        if(e.touches.length === 1) {
-                            var deltaX = e.touches[0].clientX - this.startX;
-                            var deltaY = e.touches[0].clientY - this.startY;
-
-                            this.startX = e.touches[0].clientX;
-                            this.startY = e.touches[0].clientY;
-
-                            // Rotación Y (Horizontal)
-                            var newRotationY = this.model.object3D.rotation.y + (deltaX * 0.01);
-                            const minY = -0.8;
-                            const maxY = 0.8;
-                            this.model.object3D.rotation.y = Math.min(Math.max(newRotationY, minY), maxY);
-
-                            // Rotación X (Vertical)
-                            var newRotationX = this.model.object3D.rotation.x + (deltaY * 0.01);
-                            const minX = 0.0; 
-                            const maxX = 0.8;
-                            this.model.object3D.rotation.x = Math.min(Math.max(newRotationX, minX), maxX);
-                        } 
-                        else if (e.touches.length === 2 && this.initialDistance > 0) {
-                             var dx = e.touches[0].clientX - e.touches[1].clientX;
-                             var dy = e.touches[0].clientY - e.touches[1].clientY;
-                             var currentDistance = Math.sqrt(dx * dx + dy * dy);
-                             
-                             var scaleFactor = currentDistance / this.initialDistance;
-
-                             var newX = this.initialScaleVector.x * scaleFactor;
-                             var newY = this.initialScaleVector.y * scaleFactor;
-                             var newZ = this.initialScaleVector.z * scaleFactor;
-
-                             // --- AQUI ESTA EL CAMBIO IMPORTANTE ---
-                             // minScale está puesto exactamente en 0.012 (tu tamaño original)
-                             // Esto permite agrandar y volver a achicar, pero NUNCA bajar de 0.012
-                             const minScale = 0.012; 
-                             const maxScale = 0.35;  
-
-                             newX = Math.min(Math.max(newX, minScale), maxScale);
-                             newY = Math.min(Math.max(newY, minScale), maxScale);
-                             newZ = Math.min(Math.max(newZ, minScale), maxScale);
-
-                             this.model.object3D.scale.set(newX, newY, newZ);
-                        }
-                    });
-                }
-            });
-
-            window.addEventListener('arjs-video-loaded', function(e) {
-                setTimeout(() => { document.body.classList.add('arjs-ready'); }, 1000);
-            });
-            // Fallback
-            setTimeout(() => { document.body.classList.add('arjs-ready'); }, 6000);
-        </script>
-    </head>
-
-    <body>
-        <div id="splash-screen"><img src="assets/logo.png" alt="Cargando Bhastian AR..."></div>
-
-        <a href="https://wa.me/593983088889?text=Hola%20Bhastian,%20vi%20su%20experiencia%20AR%20y%20me%20interesa." 
-           target="_blank" 
-           id="whatsapp-button">
-           <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp Icon">
-        </a>
-
-        <a-scene
-            master-controller
-            vr-mode-ui="enabled: false"
-            loading-screen="enabled: false;"
-            arjs='sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;'
-            renderer="logarithmicDepthBuffer: true; colorManagement: true; antialias: true;" 
-            id="scene" 
-            embedded 
-        >
-            <a-assets>
-                <video id="vid" src="assets/tanjiro.mp4" preload="auto" loop crossorigin webkit-playsinline playsinline></video>
-                <a-asset-item id="miModelo" src="assets/mi-modelo.glb"></a-asset-item>
-            </a-assets>
-
-            <a-entity light="type: ambient; intensity: 1.5; color: #ffffff"></a-entity>
-            <a-entity light="type: directional; intensity: 2" position="2 4 4"></a-entity>
-
-            <a-entity camera>
-                <a-entity id="hud-container" visible="false" position="0 0 -6">
-                    
-                    <a-entity
-                        id="animatedModel"
-                        gltf-model="#miModelo"
-                        scale="0.012 0.012 0.012"
-                        position="0 -1.5 0" 
-                        rotation="0 0 0" 
-                        animation-mixer="loop: repeat"
-                        fix-materials
-                    ></a-entity>
-
-                </a-entity>
-            </a-entity>
-
-            <a-marker type="pattern" preset="custom" url="assets/marker.patt" id="markerA">
-            </a-marker>
-
-        </a-scene>
-    </body>
+        // Evento extra para asegurar que el audio se calle al dar clic en WhatsApp
+        whatsappBtn.addEventListener('click', () => {
+            audio.pause();
+            // La navegación ocurre automáticamente por el href
+        });
+    </script>
+</body>
 </html>
