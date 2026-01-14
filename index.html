@@ -3,22 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Experiencia Wolverine V8</title>
+    <title>Experiencia Wolverine V9</title>
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
 
     <style>
-        /* FONDO GENERAL EN NEGRO */
+        /* FONDO NEGRO */
         body { margin: 0; padding: 0; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #000; }
         
-        /* VISOR 3D CON FONDO NEGRO */
         model-viewer {
             width: 100vw; height: 100vh;
-            background-color: #000000; /* ANTES ERA #f0f0f0 (Gris), AHORA ES NEGRO */
+            background-color: #000000;
             position: absolute; top: 0; left: 0; z-index: 1; outline: none;
             --poster-color: transparent;
         }
 
-        /* Pantalla de carga (Sigue blanca por tu diseño inicial) */
+        /* PANTALLA DE CARGA (BLANCA) */
         #splash-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: white;
@@ -62,7 +61,7 @@
         </div>
         <div id="error-message">No se encontró wolverineliviano2.glb</div>
         
-        <button id="start-button">VER EXPERIENCIA V8</button>
+        <button id="start-button">VER EXPERIENCIA V9</button>
     </div>
 
     <audio id="bg-music" loop>
@@ -77,8 +76,8 @@
         disable-pan
         disable-tap
         
-        min-camera-orbit="-30deg 56deg auto"
-        max-camera-orbit="30deg 116deg auto"
+        min-camera-orbit="-30deg 56deg 100m"
+        max-camera-orbit="30deg 116deg 900m"
         
         interpolation-decay="0" 
         camera-controls
@@ -96,9 +95,9 @@
         const errorMsg = document.getElementById('error-message');
 
         modelViewer.addEventListener('load', () => {
-            console.log("Modelo cargado. Entorno NEGRO activado.");
+            console.log("Modelo cargado. Zoom ajustado V9.");
 
-            // Configuración de Cámara V7
+            // Posición Inicial (600m)
             modelViewer.cameraOrbit = "-0.01475rad 1.49484rad 600m";
             modelViewer.cameraTarget = "-0.40003m 101.9667m 89.2276m";
             modelViewer.fieldOfView = "10deg"; 
