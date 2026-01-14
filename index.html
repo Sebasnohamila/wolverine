@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MODO DEBUG - Wolverine</title>
+    <title>Experiencia Wolverine</title>
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
 
     <style>
-        body { margin: 0; padding: 0; overflow: hidden; font-family: monospace; }
+        body { margin: 0; padding: 0; overflow: hidden; font-family: sans-serif; }
         
+        /* El modelo ocupa toda la pantalla pero está detrás */
         model-viewer {
             width: 100vw;
             height: 100vh;
@@ -17,41 +18,76 @@
             top: 0; left: 0; z-index: 1; 
         }
 
-        /* CUADRO DE DATOS DEBUG */
-        #debug-panel {
+        /* Pantalla de carga */
+        #splash-screen {
             position: fixed;
-            bottom: 20px;
-            left: 20px;
-            right: 20px;
-            background-color: rgba(0, 0, 0, 0.8);
-            color: #00ff00; /* Verde hacker para que resalte */
-            padding: 15px;
-            border-radius: 8px;
-            z-index: 9999;
-            font-size: 14px;
-            pointer-events: none; /* Para que puedas tocar el modelo a través del texto */
-            white-space: pre-wrap; /* Mantiene los saltos de línea */
-            border: 2px solid #00ff00;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center; 
+            justify-content: center;
+            z-index: 999;
+            transition: opacity 0.5s ease;
         }
 
+        #company-logo {
+            max-width: 150px;
+            margin-bottom: 40px;
+        }
+
+        #loader-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center; 
+            justify-content: center;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #333;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .loading-text { color: #666; font-size: 14px; }
+        
+        #error-message { color: red; margin-top: 20px; display: none; text-align: center; }
+
         #start-button {
-            position: fixed;
-            top: 20px; right: 20px;
-            z-index: 999;
-            padding: 10px 20px;
-            background: black; color: white;
-            border: none; border-radius: 5px;
+            display: none;
+            padding: 15px 30px;
+            background-color: #000;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
             cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
     </style>
 </head>
 <body>
 
-    <div id="debug-panel">
-        Mueve el modelo para ver los datos aquí...
-    </div>
+    <div id="splash-screen">
+        <img src="logo.png" alt="Logo Bhastian" id="company-logo">
+        
+        <div id="loader-container">
+            <div class="spinner"></div>
+            <div class="loading-text">Cargando experiencia...</div>
+        </div>
 
-    <button id="start-button">ACTIVAR AUDIO</button>
+        <div id="error-message">
+            No se encontró el archivo "wolverineliviano2.glb".<br>Revisa el nombre en GitHub.
+        </div>
+
+        <button id="start-button">VER EXPERIENCIA</button>
+    </div>
 
     <audio id="bg-music" loop>
         <source src="xmen1.mp3" type="audio/mpeg">
@@ -60,50 +96,43 @@
     <model-viewer 
         id="viewer"
         src="wolverineliviano2.glb"
-        alt="Wolverine Debug"
+        alt="Wolverine 3D"
+        
+        /* TUS DATOS DE POSICIÓN */
+        camera-orbit="0.020751975497242097rad 1.5302374852732117rad 1196.7118074983553m"
+        camera-target="-0.853619793680227m 110.67920226676614m 86.8967854704676m"
+        field-of-view="18.286182673304666deg"
+        
+        auto-rotate
         camera-controls
         shadow-intensity="1"
         ar>
     </model-viewer>
 
     <script>
-        const viewer = document.querySelector('#viewer');
-        const debugPanel = document.getElementById('debug-panel');
-        const startBtn = document.getElementById('start-button');
+        const modelViewer = document.querySelector('#viewer');
+        const loaderContainer = document.getElementById('loader-container');
+        const startButton = document.getElementById('start-button');
+        const splashScreen = document.getElementById('splash-screen');
         const audio = document.getElementById('bg-music');
+        const errorMsg = document.getElementById('error-message');
 
-        // Botón simple de inicio
-        startBtn.addEventListener('click', () => {
-            audio.play();
-            startBtn.style.display = 'none';
+        modelViewer.addEventListener('load', () => {
+            loaderContainer.style.display = 'none';
+            startButton.style.display = 'block';
+            console.log("Wolverine cargado y posicionado.");
         });
 
-        // FUNCIÓN MÁGICA: Escuchar el movimiento de la cámara
-        viewer.addEventListener('camera-change', (event) => {
-            // Obtener los datos actuales
-            const orbit = viewer.getCameraOrbit();
-            const target = viewer.getCameraTarget();
-            const fov = viewer.getFieldOfView();
+        modelViewer.addEventListener('error', (error) => {
+            loaderContainer.style.display = 'none';
+            errorMsg.style.display = 'block';
+            console.error("Error cargando GLB:", error);
+        });
 
-            // Convertir radianes a grados para que sea más fácil de leer (opcional, pero model-viewer acepta 'rad' o 'deg')
-            // Aquí usaremos lo que devuelve la API y lo formateamos para copiar y pegar
-            
-            // Orbit (Posición de cámara alrededor del objeto)
-            const orbitString = `${orbit.theta}rad ${orbit.phi}rad ${orbit.radius}m`;
-            
-            // Target (Hacia dónde mira la cámara - X Y Z)
-            const targetString = `${target.x}m ${target.y}m ${target.z}m`;
-
-            // Field of View (Zoom/Escala)
-            const fovString = `${fov}deg`;
-
-            // Mostrar en pantalla
-            debugPanel.innerHTML = `
-<strong>COPIA ESTOS DATOS:</strong><br><br>
-camera-orbit="${orbitString}"<br>
-camera-target="${targetString}"<br>
-field-of-view="${fovString}"
-            `;
+        startButton.addEventListener('click', () => {
+            audio.play().catch(e => console.log("Audio error:", e));
+            splashScreen.style.opacity = '0';
+            setTimeout(() => { splashScreen.style.display = 'none'; }, 500);
         });
     </script>
 </body>
