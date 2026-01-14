@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Experiencia Wolverine V10 Final</title>
+    <title>Experiencia Wolverine V11</title>
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
 
     <style>
@@ -18,36 +18,47 @@
             --poster-color: transparent;
         }
 
-        /* --- ESTILOS DEL BOTÓN DE WHATSAPP --- */
+        /* --- ESTILOS DEL BOTÓN DE WHATSAPP (CORREGIDO) --- */
         #whatsapp-button {
             position: fixed;
             bottom: 25px;
             right: 25px;
-            z-index: 9999; /* Por encima de todo */
-            width: 60px;
-            height: 60px;
-            background-color: #25D366; /* Color oficial de WhatsApp */
-            border-radius: 50%;
+            z-index: 9999;
+            
+            /* TAMAÑO REDUCIDO UN 30% (Antes 60px, ahora 42px) */
+            width: 42px;
+            height: 42px;
+            
+            /* FONDO TRANSPARENTE (Quitamos el verde #25D366) */
+            background-color: transparent;
+            
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            
+            /* Quitamos sombra para que sea más limpio, o dejamos una suave si el logo es oscuro */
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
+            
             transition: transform 0.3s ease;
-            /* Oculto al inicio mientras carga la experiencia */
             opacity: 0; 
             pointer-events: none;
+            
+            /* Quitamos border-radius del contenedor porque ya no es un círculo de color */
+            border: none;
+            text-decoration: none; /* Por si acaso */
         }
 
         #whatsapp-button img {
-            width: 35px;
-            height: 35px;
+            /* La imagen ocupa todo el espacio del botón reducido */
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         #whatsapp-button:hover {
-            transform: scale(1.1); /* Efecto al pasar el mouse */
+            transform: scale(1.1);
         }
 
-        /* Cuando la experiencia carga, mostramos el botón */
         body.loaded #whatsapp-button {
             opacity: 1;
             pointer-events: auto;
@@ -93,7 +104,7 @@
             <div class="loading-text">Cargando experiencia...</div>
         </div>
         <div id="error-message">No se encontró wolverineliviano2.glb</div>
-        <button id="start-button">VER EXPERIENCIA V10</button>
+        <button id="start-button">VER EXPERIENCIA V11</button>
     </div>
 
     <audio id="bg-music" loop>
@@ -104,15 +115,11 @@
         id="viewer"
         src="wolverineliviano2.glb"
         alt="Wolverine 3D"
-        
         disable-tap
-        
         min-field-of-view="5deg"
         max-field-of-view="15deg"
-        
         min-camera-orbit="-30deg 56deg auto"
         max-camera-orbit="30deg 116deg auto"
-        
         interpolation-decay="0" 
         camera-controls
         shadow-intensity="1"
@@ -120,8 +127,8 @@
         ar-modes="webxr scene-viewer quick-look">
     </model-viewer>
 
-    <a href="https://wa.me/593983088889" target="_blank" id="whatsapp-button">
-        <img src="whatsapp.png" alt="Contactar por WhatsApp">
+    <a href="https://wa.me/000000000000" id="whatsapp-button">
+        <img src="whatsapp.png" alt="WhatsApp">
     </a>
 
     <script>
@@ -131,35 +138,30 @@
         const splashScreen = document.getElementById('splash-screen');
         const audio = document.getElementById('bg-music');
         const errorMsg = document.getElementById('error-message');
+        const whatsappBtn = document.getElementById('whatsapp-button');
         
-        // Variables de Paneo Vertical V9
         let isLoaded = false;
         const initialX = -0.40003; 
         const initialY = 101.9667; 
-        // Rango vertical permitido
         const limitY = 30; 
 
         modelViewer.addEventListener('load', () => {
-            console.log("Modelo cargado. Aplicando V10...");
+            console.log("Modelo cargado. V11 Lista.");
             isLoaded = true;
 
-            // Posición Inicial
             modelViewer.cameraOrbit = "-0.01475rad 1.49484rad 600m";
-            // Nos aseguramos que el target inicial sea exactamente el centro matemático
             modelViewer.cameraTarget = `${initialX}m ${initialY}m 89.2276m`;
             modelViewer.fieldOfView = "10deg"; 
-            
             modelViewer.jumpCameraToGoal();
 
             loaderContainer.style.display = 'none';
             startButton.style.display = 'block';
         });
 
-        // Lógica de Bloqueo Horizontal (Misma de V9)
         modelViewer.addEventListener('camera-change', (event) => {
             if (!isLoaded) return;
             const target = modelViewer.getCameraTarget();
-            let newX = initialX; // Siempre forzar X al centro
+            let newX = initialX;
             let newY = target.y;
             if (newY > initialY + limitY) newY = initialY + limitY;
             if (newY < initialY - limitY) newY = initialY - limitY;
@@ -179,9 +181,14 @@
             splashScreen.style.opacity = '0';
             setTimeout(() => { 
                 splashScreen.style.display = 'none';
-                // Añadimos la clase 'loaded' al body para mostrar el botón de WhatsApp suavemente
                 document.body.classList.add('loaded');
             }, 600);
+        });
+
+        // Evento extra para asegurar que el audio se calle al dar clic en WhatsApp
+        whatsappBtn.addEventListener('click', () => {
+            audio.pause();
+            // La navegación ocurre automáticamente por el href
         });
     </script>
 </body>
