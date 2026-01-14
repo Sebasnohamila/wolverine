@@ -7,8 +7,10 @@
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
 
     <style>
+        /* Fondo Negro */
         body { margin: 0; padding: 0; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #000; }
         
+        /* Visor */
         model-viewer {
             width: 100vw; height: 100vh;
             background-color: #000000;
@@ -16,6 +18,7 @@
             --poster-color: transparent;
         }
 
+        /* Pantalla de Carga Blanca */
         #splash-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: white;
@@ -25,20 +28,16 @@
         }
 
         #company-logo { max-width: 150px; margin-bottom: 40px; }
-
         #loader-container { display: flex; flex-direction: column; align-items: center; justify-content: center; }
-
         .spinner {
             border: 4px solid rgba(0, 0, 0, 0.1); width: 36px; height: 36px;
             border-radius: 50%; border-left-color: #333;
             animation: spin 1s linear infinite; margin-bottom: 15px;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
         .loading-text { color: #666; font-size: 13px; letter-spacing: 0.5px; text-transform: uppercase; }
-        
         #error-message { color: #e74c3c; margin-top: 20px; display: none; text-align: center; font-size: 14px; }
-
+        
         #start-button {
             display: none; margin-top: 20px; padding: 15px 35px;
             background-color: #000; color: white;
@@ -58,7 +57,6 @@
             <div class="loading-text">Cargando experiencia...</div>
         </div>
         <div id="error-message">No se encontró wolverineliviano2.glb</div>
-        
         <button id="start-button">VER EXPERIENCIA V9</button>
     </div>
 
@@ -73,9 +71,9 @@
         
         disable-tap
         
-        min-field-of-view="2deg"
-        max-field-of-view="14deg"
-
+        min-field-of-view="5deg"
+        max-field-of-view="60deg"
+        
         min-camera-orbit="-30deg 56deg auto"
         max-camera-orbit="30deg 116deg auto"
         
@@ -93,20 +91,24 @@
         const splashScreen = document.getElementById('splash-screen');
         const audio = document.getElementById('bg-music');
         const errorMsg = document.getElementById('error-message');
-
-        // VARIABLES DE CONFIGURACIÓN DE PANEO (VERTICAL)
-        // Posición Y inicial: 101.96m
-        const minY = 95;  // Qué tan abajo puede bajar la cámara
-        const maxY = 108; // Qué tan arriba puede subir la cámara
-        const fixedX = -0.40003; // Bloqueo horizontal exacto
-        const fixedZ = 89.2276;  // Bloqueo profundidad exacto
+        
+        // VARIABLES PARA CONTROLAR EL PANEO
+        let isLoaded = false;
+        // Estas son las coordenadas originales que nos gustaron
+        const initialX = -0.40003; 
+        const initialY = 101.9667; 
+        const initialZ = 89.2276;
+        
+        // Rango de movimiento vertical permitido (aprox 30 unidades arriba/abajo)
+        const limitY = 30; 
 
         modelViewer.addEventListener('load', () => {
-            console.log("V9: Zoom ampliado y Paneo Vertical Limitado.");
+            console.log("Modelo cargado. Aplicando V9...");
+            isLoaded = true;
 
             // Posición Inicial
             modelViewer.cameraOrbit = "-0.01475rad 1.49484rad 600m";
-            modelViewer.cameraTarget = `${fixedX}m 101.9667m ${fixedZ}m`;
+            modelViewer.cameraTarget = `${initialX}m ${initialY}m ${initialZ}m`;
             modelViewer.fieldOfView = "10deg"; 
             
             modelViewer.jumpCameraToGoal();
@@ -116,24 +118,29 @@
         });
 
         // --- LÓGICA DE BLOQUEO DE PANEO HORIZONTAL ---
-        modelViewer.addEventListener('camera-change', (e) => {
+        modelViewer.addEventListener('camera-change', (event) => {
+            if (!isLoaded) return;
+
             const target = modelViewer.getCameraTarget();
             
-            // Si el usuario intenta mover a los lados (Eje X) o Profundidad (Eje Z), lo corregimos
-            // Si intenta ir muy arriba o muy abajo (Eje Y), lo limitamos
-            let newX = fixedX;
-            let newZ = fixedZ;
+            // 1. ¿Se movió en X (Lados)? -> ¡CORREGIRLO!
+            // Si intenta irse a los lados, lo forzamos a volver a 'initialX'
+            let newX = initialX;
+
+            // 2. ¿Se movió en Y (Arriba/Abajo)? -> ¡LIMITARLO!
             let newY = target.y;
+            // Techo (No subir más de esto)
+            if (newY > initialY + limitY) newY = initialY + limitY;
+            // Suelo (No bajar más de esto)
+            if (newY < initialY - limitY) newY = initialY - limitY;
 
-            // Restricción Vertical (Clamp)
-            if (newY < minY) newY = minY;
-            if (newY > maxY) newY = maxY;
-
-            // Solo aplicamos la corrección si se ha desviado para ahorrar recursos
-            if (Math.abs(target.x - fixedX) > 0.01 || Math.abs(target.z - fixedZ) > 0.01 || target.y < minY || target.y > maxY) {
-                modelViewer.cameraTarget = `${newX}m ${newY}m ${newZ}m`;
+            // Si las coordenadas corregidas son diferentes a las actuales, aplicamos la corrección
+            if (Math.abs(target.x - newX) > 0.001 || Math.abs(target.y - newY) > 0.001) {
+                // Mantenemos la Z actual para no romper la profundidad
+                modelViewer.cameraTarget = `${newX}m ${newY}m ${target.z}m`;
             }
         });
+        // ---------------------------------------------
 
         modelViewer.addEventListener('error', (e) => {
             loaderContainer.style.display = 'none';
